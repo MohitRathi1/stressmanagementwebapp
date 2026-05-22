@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMA Study Guide – Predictive & Machine Learning Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --surface: #0d1117;
+    --card: #111827;
+    --border: #1f2937;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #7209b7;
+    --accent4: #ffd60a;
+    --accent5: #4cc9f0;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --unit1: #00f5d4;
+    --unit2: #f72585;
+    --unit3: #ffd60a;
+    --unit4: #4cc9f0;
+    --unit5: #a855f7;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+  #canvas-bg {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0; opacity: 0.35;
+    pointer-events: none;
+  }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(5,8,16,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem; color: var(--accent1);
+    text-transform: uppercase; letter-spacing: 2px;
+  }
+  .nav-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .nav-links a {
+    font-size: 0.72rem; font-family: 'Space Mono', monospace;
+    color: var(--muted); text-decoration: none;
+    padding: 0.3rem 0.7rem; border: 1px solid transparent;
+    border-radius: 4px; transition: all 0.25s;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .nav-links a:hover { color: var(--accent1); border-color: var(--accent1); }
+
+  #hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 6rem 1.5rem 4rem;
+  }
+  .hero-badge {
+    font-family: 'Space Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 4px; color: var(--accent1); text-transform: uppercase;
+    border: 1px solid var(--accent1); padding: 0.4rem 1rem;
+    border-radius: 20px; margin-bottom: 2rem;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-weight: 800; line-height: 1.05; margin-bottom: 1.5rem;
+    opacity: 0; animation: fadeUp 0.9s 0.4s forwards;
+  }
+  .hero-title .line1 { display: block; color: var(--text); }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(90deg, var(--accent1), var(--accent5), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 1.1rem; color: var(--muted); max-width: 600px;
+    opacity: 0; animation: fadeUp 0.9s 0.6s forwards; margin-bottom: 3rem;
+  }
+  .unit-pills {
+    display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.9s 0.8s forwards;
+  }
+  .unit-pill {
+    font-family: 'Space Mono', monospace; font-size: 0.7rem;
+    padding: 0.5rem 1.2rem; border-radius: 30px; border: 1px solid;
+    cursor: pointer; transition: all 0.3s; text-decoration: none;
+    letter-spacing: 1px;
+  }
+  .pill-1 { color: var(--unit1); border-color: var(--unit1); }
+  .pill-2 { color: var(--unit2); border-color: var(--unit2); }
+  .pill-3 { color: var(--unit3); border-color: var(--unit3); }
+  .pill-4 { color: var(--unit4); border-color: var(--unit4); }
+  .pill-5 { color: var(--unit5); border-color: var(--unit5); }
+  .unit-pill:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .pill-1:hover { background: rgba(0,245,212,0.1); }
+  .pill-2:hover { background: rgba(247,37,133,0.1); }
+  .pill-3:hover { background: rgba(255,214,10,0.1); }
+  .pill-4:hover { background: rgba(76,201,240,0.1); }
+  .pill-5:hover { background: rgba(168,85,247,0.1); }
+
+  .scroll-cue {
+    position: absolute; bottom: 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    opacity: 0; animation: fadeUp 1s 1.2s forwards;
+    color: var(--muted); font-size: 0.7rem;
+    font-family: 'Space Mono', monospace; letter-spacing: 2px;
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--accent1), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.4; transform: scaleY(0.6); }
+  }
+
+  main { position: relative; z-index: 1; padding-bottom: 6rem; }
+
+  .unit-section { padding: 5rem 1.5rem 3rem; max-width: 1100px; margin: 0 auto; }
+
+  .unit-header {
+    display: flex; align-items: center; gap: 1.5rem;
+    margin-bottom: 3rem; padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    opacity: 0; transform: translateY(30px); transition: all 0.7s ease;
+  }
+  .unit-header.visible { opacity: 1; transform: translateY(0); }
+  .unit-number {
+    font-family: 'Space Mono', monospace; font-size: 4rem; font-weight: 700;
+    line-height: 1; opacity: 0.15; flex-shrink: 0;
+  }
+  .unit-title-block h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.4rem, 4vw, 2.2rem); font-weight: 800; margin-bottom: 0.3rem;
+  }
+  .unit-title-block p { font-size: 0.85rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  .topic-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; margin-bottom: 2rem; overflow: hidden;
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s;
+  }
+  .topic-card.visible { opacity: 1; transform: translateY(0); }
+  .topic-card:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 1.8rem; cursor: pointer;
+    border-left: 4px solid transparent; transition: background 0.2s;
+  }
+  .card-header:hover { background: rgba(255,255,255,0.02); }
+  .card-header-left { display: flex; align-items: center; gap: 1rem; }
+  .q-number {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 2px; padding: 0.3rem 0.7rem; border-radius: 4px;
+    opacity: 0.8; flex-shrink: 0;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(0.95rem, 2.5vw, 1.2rem); font-weight: 600;
+  }
+  .expand-icon { font-size: 1.2rem; transition: transform 0.4s ease; flex-shrink: 0; color: var(--muted); }
+  .card-header.open .expand-icon { transform: rotate(180deg); }
+
+  .card-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.16,1,0.3,1);
+    padding: 0 1.8rem;
+  }
+  .card-body.open { max-height: 5000px; padding-bottom: 1.8rem; }
+
+  .simple-explain {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid var(--accent1);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.95rem;
+  }
+  .simple-explain .emoji { font-size: 1.3rem; margin-right: 0.5rem; }
+
+  h3 {
+    font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+    margin: 1.5rem 0 0.8rem; letter-spacing: 0.5px;
+  }
+  h4 {
+    font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--muted);
+    margin: 1.2rem 0 0.5rem; text-transform: uppercase; letter-spacing: 2px;
+  }
+  p { font-size: 0.92rem; color: #94a3b8; margin-bottom: 0.8rem; }
+  ul, ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+  li { font-size: 0.92rem; color: #94a3b8; margin-bottom: 0.5rem; line-height: 1.6; }
+  li strong { color: var(--text); }
+
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem; margin: 1.2rem 0;
+  }
+  .info-box {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem; text-align: center;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .info-box:hover { transform: translateY(-4px); background: rgba(255,255,255,0.05); }
+  .info-box .icon { font-size: 1.8rem; margin-bottom: 0.5rem; display: block; }
+  .info-box .label {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.4rem;
+  }
+  .info-box .value { font-size: 0.88rem; font-weight: 500; color: var(--text); }
+
+  .formula {
+    background: #0a0f1a; border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem 1.4rem; font-family: 'Space Mono', monospace;
+    font-size: 0.82rem; color: var(--accent1); margin: 1rem 0;
+    overflow-x: auto; white-space: pre; line-height: 1.8;
+  }
+
+  .comp-table { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 0.85rem; border-radius: 10px; overflow: hidden; }
+  .comp-table th {
+    background: rgba(255,255,255,0.06); padding: 0.7rem 1rem;
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--muted); text-align: left;
+  }
+  .comp-table td { padding: 0.7rem 1rem; border-top: 1px solid var(--border); color: #94a3b8; vertical-align: top; }
+  .comp-table td:first-child { color: var(--text); font-weight: 500; }
+  .comp-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .steps { margin: 1rem 0; }
+  .step {
+    display: flex; gap: 1rem; margin-bottom: 1rem;
+    opacity: 0; transform: translateX(-20px); transition: all 0.5s ease;
+  }
+  .step.visible { opacity: 1; transform: translateX(0); }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-content strong { display: block; font-size: 0.92rem; margin-bottom: 0.2rem; color: var(--text); }
+  .step-content span { font-size: 0.85rem; color: var(--muted); }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0; }
+  .tag { font-family: 'Space Mono', monospace; font-size: 0.68rem; padding: 0.25rem 0.7rem; border-radius: 4px; letter-spacing: 1px; opacity: 0.8; }
+
+  .callout {
+    border-radius: 10px; padding: 1rem 1.2rem; margin: 1rem 0;
+    display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.88rem;
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .callout-tip { background: rgba(0,245,212,0.08); border: 1px solid rgba(0,245,212,0.2); }
+  .callout-warn { background: rgba(255,214,10,0.08); border: 1px solid rgba(255,214,10,0.2); }
+  .callout-danger { background: rgba(247,37,133,0.08); border: 1px solid rgba(247,37,133,0.2); }
+
+  .cm-grid {
+    display: grid; grid-template-columns: auto 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr; gap: 4px; margin: 1.2rem 0; max-width: 420px;
+  }
+  .cm-cell { padding: 0.7rem; border-radius: 6px; text-align: center; font-size: 0.82rem; font-family: 'Space Mono', monospace; }
+  .cm-header { background: rgba(255,255,255,0.05); color: var(--muted); font-size: 0.7rem; letter-spacing: 1px; }
+  .cm-tp { background: rgba(0,245,212,0.2); color: var(--accent1); font-weight: 700; }
+  .cm-tn { background: rgba(0,245,212,0.2); color: var(--accent1); font-weight: 700; }
+  .cm-fp { background: rgba(247,37,133,0.2); color: var(--accent2); }
+  .cm-fn { background: rgba(255,214,10,0.2); color: var(--accent4); }
+  .cm-label { background: transparent; color: var(--muted); font-size: 0.7rem; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5rem; letter-spacing: 1px; }
+
+  footer {
+    position: relative; z-index: 1; text-align: center;
+    padding: 3rem 1.5rem; border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 2px;
+  }
+  footer span { color: var(--accent1); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .unit-1 .card-header { border-left-color: var(--unit1); }
+  .unit-1 .q-number { background: rgba(0,245,212,0.12); color: var(--unit1); }
+  .unit-1 .unit-number { color: var(--unit1); }
+  .unit-1 .unit-title-block h2 { color: var(--unit1); }
+
+  .unit-2 .card-header { border-left-color: var(--unit2); }
+  .unit-2 .q-number { background: rgba(247,37,133,0.12); color: var(--unit2); }
+  .unit-2 .unit-number { color: var(--unit2); }
+  .unit-2 .unit-title-block h2 { color: var(--unit2); }
+  .unit-2 .simple-explain { border-left-color: var(--unit2); }
+
+  .unit-3 .card-header { border-left-color: var(--unit3); }
+  .unit-3 .q-number { background: rgba(255,214,10,0.12); color: var(--unit3); }
+  .unit-3 .unit-number { color: var(--unit3); }
+  .unit-3 .unit-title-block h2 { color: var(--unit3); }
+  .unit-3 .simple-explain { border-left-color: var(--unit3); }
+  .unit-3 .formula { color: var(--unit3); }
+
+  .unit-4 .card-header { border-left-color: var(--unit4); }
+  .unit-4 .q-number { background: rgba(76,201,240,0.12); color: var(--unit4); }
+  .unit-4 .unit-number { color: var(--unit4); }
+  .unit-4 .unit-title-block h2 { color: var(--unit4); }
+  .unit-4 .simple-explain { border-left-color: var(--unit4); }
+  .unit-4 .formula { color: var(--unit4); }
+
+  .unit-5 .card-header { border-left-color: var(--unit5); }
+  .unit-5 .q-number { background: rgba(168,85,247,0.12); color: var(--unit5); }
+  .unit-5 .unit-number { color: var(--unit5); }
+  .unit-5 .unit-title-block h2 { color: var(--unit5); }
+  .unit-5 .simple-explain { border-left-color: var(--unit5); }
+  .unit-5 .formula { color: var(--unit5); }
+
+  #btt {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 99;
+    width: 44px; height: 44px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1.2rem; transition: all 0.3s;
+    opacity: 0; transform: translateY(20px);
+  }
+  #btt.show { opacity: 1; transform: translateY(0); }
+  #btt:hover { background: var(--accent1); border-color: var(--accent1); }
+
+  @media (max-width: 768px) {
+    nav { padding: 0.8rem 1rem; }
+    .nav-links { display: none; }
+    .unit-section { padding: 4rem 1rem 2rem; }
+    .card-header { padding: 1rem 1.2rem; }
+    .card-body.open { padding: 0 1.2rem 1.2rem; }
+    .card-header-left { gap: 0.6rem; }
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+    .formula { font-size: 0.72rem; }
+    .cm-grid { max-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .info-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<nav>
+  <div class="nav-logo">PMA Guide</div>
+  <div class="nav-links">
+    <a href="#unit1">Unit 1</a>
+    <a href="#unit2">Unit 2</a>
+    <a href="#unit3">Unit 3</a>
+    <a href="#unit4">Unit 4</a>
+    <a href="#unit5">Unit 5</a>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-badge">📊 Exam Study Guide</div>
+  <h1 class="hero-title">
+    <span class="line1">Predictive &</span>
+    <span class="line2">Machine Learning</span>
+  </h1>
+  <p class="hero-sub">All 13 topics explained simply. Tap any card to reveal the full answer — formulas, examples, and key ideas included.</p>
+  <div class="unit-pills">
+    <a href="#unit1" class="unit-pill pill-1">Unit 1 · Basics</a>
+    <a href="#unit2" class="unit-pill pill-2">Unit 2 · Data Prep</a>
+    <a href="#unit3" class="unit-pill pill-3">Unit 3 · Algorithms</a>
+    <a href="#unit4" class="unit-pill pill-4">Unit 4 · Deep Learning</a>
+    <a href="#unit5" class="unit-pill pill-5">Unit 5 · Evaluation</a>
+  </div>
+  <div class="scroll-cue">
+    <div class="scroll-line"></div>
+    SCROLL
+  </div>
+</section>
+
+<main>
+
+<!-- ══════ UNIT 1 ══════ -->
+<section id="unit1" class="unit-section unit-1">
+  <div class="unit-header">
+    <div class="unit-number">01</div>
+    <div class="unit-title-block">
+      <h2>Foundations of Predictive Analytics</h2>
+      <p>// 2 topics · Core concepts</p>
+    </div>
+  </div>
+
+  <div class="topic-card unit-1">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 1.1</span>
+        <span class="card-title">What is Predictive Analytics?</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🔮</span>
+        <strong>Simple:</strong> Predictive analytics is like a smart weather forecast — but for anything. It looks at <em>past data</em> to guess what will happen <em>in the future</em>. It gives you the most likely outcome as a probability, not a certainty.
+      </div>
+      <h3>Core Idea</h3>
+      <p>It uses historical data + statistics + machine learning to answer: <strong>"What is most likely to happen next?"</strong></p>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">📁</span><div class="label">Input</div><div class="value">Past / Historical Data</div></div>
+        <div class="info-box"><span class="icon">⚙️</span><div class="label">Process</div><div class="value">ML Algorithms + Statistics</div></div>
+        <div class="info-box"><span class="icon">📈</span><div class="label">Output</div><div class="value">Future Predictions</div></div>
+      </div>
+      <h3>Real-World Examples</h3>
+      <ul>
+        <li><strong>Netflix</strong> predicts what you'll watch next based on history</li>
+        <li><strong>Banks</strong> predict if you'll default on a loan (credit scoring)</li>
+        <li><strong>Hospitals</strong> predict which patients will be readmitted</li>
+        <li><strong>Amazon</strong> predicts what you'll buy before you search for it</li>
+        <li><strong>Factories</strong> predict when machines will break (predictive maintenance)</li>
+      </ul>
+      <h3>3 Types of Predictive Models</h3>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">🎯</span><div class="label">Predictive Model</div><div class="value">Will this customer churn? (individual level)</div></div>
+        <div class="info-box"><span class="icon">🗂️</span><div class="label">Descriptive Model</div><div class="value">Group customers by behavior</div></div>
+        <div class="info-box"><span class="icon">🧭</span><div class="label">Decision Model</div><div class="value">What action gives the best outcome?</div></div>
+      </div>
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span>Predictive analytics does NOT say what <em>will</em> happen. It says what is <em>most likely</em> to happen, with a probability score.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-card unit-1">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 1.2</span>
+        <span class="card-title">Steps in the Predictive Modeling Process</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🗺️</span>
+        <strong>Simple:</strong> Building a predictive model is like building a house — follow specific steps in order. Skip any step, and the quality of your final result suffers.
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">1</div><div class="step-content"><strong>Define the Problem</strong><span>What exactly are you predicting? What is success? Define your target variable.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">2</div><div class="step-content"><strong>Collect Data</strong><span>Gather relevant records from databases, APIs, logs, surveys, sensors.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">3</div><div class="step-content"><strong>Clean the Data</strong><span>Fix missing values, remove duplicates, handle outliers. "Garbage In = Garbage Out."</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">4</div><div class="step-content"><strong>Explore Data (EDA)</strong><span>Find patterns, distributions, correlations using charts and statistics.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">5</div><div class="step-content"><strong>Feature Engineering</strong><span>Create useful new columns; select the most important features.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">6</div><div class="step-content"><strong>Choose a Model</strong><span>Regression (numbers), Classification (categories), Clustering (groups).</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">7</div><div class="step-content"><strong>Train the Model</strong><span>Feed 70–80% of data to the algorithm so it learns patterns.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">8</div><div class="step-content"><strong>Evaluate the Model</strong><span>Test on remaining 20–30% using accuracy, F1-score, RMSE, AUC etc.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">9</div><div class="step-content"><strong>Tune the Model</strong><span>Adjust hyperparameters, use cross-validation to avoid overfitting.</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(0,245,212,0.15);color:var(--unit1);">10</div><div class="step-content"><strong>Deploy & Monitor</strong><span>Put model into real use; watch performance and retrain as needed.</span></div></div>
+      </div>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <span><strong>Most critical step?</strong> Data Cleaning (Step 3). Real-world data is always messy. Clean data = reliable model.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ UNIT 2 ══════ -->
+<section id="unit2" class="unit-section unit-2">
+  <div class="unit-header">
+    <div class="unit-number">02</div>
+    <div class="unit-title-block">
+      <h2>Data Preparation & Exploration</h2>
+      <p>// 3 topics · Normalization · Missing Values · EDA</p>
+    </div>
+  </div>
+
+  <div class="topic-card unit-2">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 2.1</span>
+        <span class="card-title">Concept of Normalization</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">⚖️</span>
+        <strong>Simple:</strong> Imagine comparing a test score (0–100) with height (150–190 cm). The height numbers are bigger, so a model might think height is more important — even when it isn't! Normalization puts all features on the same playing field.
+      </div>
+      <h3>Why Normalize?</h3>
+      <ul>
+        <li>Distance-based algorithms (kNN, SVM, Neural Networks) are <strong>scale-sensitive</strong></li>
+        <li>Large values dominate the model unfairly</li>
+        <li>Speeds up gradient descent convergence in neural networks</li>
+      </ul>
+      <h4>① Min-Max Normalization — Scales to [0, 1]</h4>
+      <div class="formula">X_norm = (X - X_min) / (X_max - X_min)</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(247,37,133,0.1);color:var(--unit2);">✅ Simple &amp; bounded</span>
+        <span class="tag" style="background:rgba(247,37,133,0.1);color:var(--unit2);">❌ Sensitive to outliers</span>
+      </div>
+      <h4>② Z-Score Standardization — Centers at 0</h4>
+      <div class="formula">X_std = (X - mean) / standard_deviation</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(247,37,133,0.1);color:var(--unit2);">✅ Best for Gaussian data</span>
+        <span class="tag" style="background:rgba(247,37,133,0.1);color:var(--unit2);">❌ Outliers distort mean</span>
+      </div>
+      <h4>③ Robust Scaling — Uses median &amp; IQR</h4>
+      <div class="formula">X_robust = (X - Median) / IQR</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(247,37,133,0.1);color:var(--unit2);">✅ Best when outliers are present</span>
+      </div>
+      <h4>④ Decimal Scaling</h4>
+      <div class="formula">X_scaled = X / 10^j   (where max |X_scaled| &lt; 1)</div>
+      <table class="comp-table">
+        <tr><th>Situation</th><th>Use This Method</th></tr>
+        <tr><td>No outliers, need 0–1 range</td><td>Min-Max Normalization</td></tr>
+        <tr><td>Data is bell-shaped (Gaussian)</td><td>Z-Score Standardization</td></tr>
+        <tr><td>Outliers are present</td><td>Robust Scaling</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="topic-card unit-2">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 2.2</span>
+        <span class="card-title">Methods of Handling Missing Values</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🕳️</span>
+        <strong>Simple:</strong> Real datasets always have blank cells — someone skipped a question, a sensor failed, data wasn't recorded. You can't just ignore blanks. You either remove those rows (deletion) or fill them in cleverly (imputation).
+      </div>
+      <h3>Types of Missingness</h3>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">🎲</span><div class="label">MCAR</div><div class="value">Missing Completely At Random — no pattern</div></div>
+        <div class="info-box"><span class="icon">🔗</span><div class="label">MAR</div><div class="value">Missing At Random — linked to another column</div></div>
+        <div class="info-box"><span class="icon">🎯</span><div class="label">MNAR</div><div class="value">Not At Random — missing because of its own value</div></div>
+      </div>
+      <h3>Deletion Methods</h3>
+      <ul>
+        <li><strong>Listwise Deletion:</strong> Remove the whole row if any value is missing. Simple but loses data.</li>
+        <li><strong>Pairwise Deletion:</strong> Use available data for each analysis. Keeps more data than listwise.</li>
+      </ul>
+      <h3>Imputation Methods (Filling In)</h3>
+      <ul>
+        <li><strong>Mean/Median/Mode:</strong> Replace blank with column average or most frequent value. Fast but oversimplified.</li>
+        <li><strong>Forward/Backward Fill:</strong> Use previous or next row's value. Great for time-series data.</li>
+        <li><strong>KNN Imputation:</strong> Find similar rows and use their values. More accurate, but slower.</li>
+        <li><strong>Regression Imputation:</strong> Build a model to predict the missing value from other columns.</li>
+        <li><strong>MICE (Multiple Imputation):</strong> Create many complete datasets, analyze each, combine results. Gold standard!</li>
+        <li><strong>Flag / Indicator Method:</strong> Add a column (1 = was missing, 0 = not missing) so model learns from missingness pattern.</li>
+      </ul>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <span>Never blindly delete rows if many values are missing — you'll lose important information. Use imputation instead!</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-card unit-2">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 2.3</span>
+        <span class="card-title">EDA and Visualization Techniques</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🔍</span>
+        <strong>Simple:</strong> EDA is like inspecting ingredients before cooking. Before you build any model, you explore and understand your data — look for patterns, weird values, and relationships between columns.
+      </div>
+      <h3>What EDA Tells You</h3>
+      <ul>
+        <li>What shape/size is the dataset? What are the column types?</li>
+        <li>Are there missing values, duplicates, or wrong entries?</li>
+        <li>How are values distributed? (normal, skewed, bimodal?)</li>
+        <li>Are features correlated with each other or with the target?</li>
+        <li>Are there outliers that could distort the model?</li>
+      </ul>
+      <h3>Common Visualization Techniques</h3>
+      <table class="comp-table">
+        <tr><th>Chart</th><th>Purpose</th><th>Example Use</th></tr>
+        <tr><td>📊 Histogram</td><td>Show distribution of one variable</td><td>Age spread in dataset</td></tr>
+        <tr><td>📦 Box Plot</td><td>Spread, quartiles, and outliers</td><td>Salary outliers by department</td></tr>
+        <tr><td>🔵 Scatter Plot</td><td>Relationship between 2 variables</td><td>Height vs Weight</td></tr>
+        <tr><td>📈 Line Plot</td><td>Trends over time</td><td>Monthly sales trends</td></tr>
+        <tr><td>🌡️ Heatmap</td><td>Correlation matrix overview</td><td>Feature-to-feature correlations</td></tr>
+        <tr><td>🥧 Pie Chart</td><td>Part-to-whole comparison</td><td>Market share by category</td></tr>
+        <tr><td>📏 Bar Chart</td><td>Compare categorical frequencies</td><td>Sales by region</td></tr>
+        <tr><td>🎻 Violin Plot</td><td>Distribution shape + box plot</td><td>Score comparison across groups</td></tr>
+        <tr><td>🔗 Pair Plot</td><td>All pairwise relationships at once</td><td>Multi-feature dataset overview</td></tr>
+      </table>
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span>EDA always comes BEFORE modeling. Skipping EDA means you'll miss data problems that can silently destroy your model's accuracy.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ UNIT 3 ══════ -->
+<section id="unit3" class="unit-section unit-3">
+  <div class="unit-header">
+    <div class="unit-number">03</div>
+    <div class="unit-title-block">
+      <h2>Algorithms & Evaluation Metrics</h2>
+      <p>// 3 topics · Regression · Performance Metrics · kNN</p>
+    </div>
+  </div>
+
+  <div class="topic-card unit-3">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 3.1</span>
+        <span class="card-title">Linear Regression — Equation &amp; Types</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">📏</span>
+        <strong>Simple:</strong> Linear Regression draws the best straight line through your data to predict a number. Like: "For every extra hour studied, exam score goes up by 5 marks."
+      </div>
+      <h3>Core Equations</h3>
+      <h4>Simple Linear Regression (1 input feature)</h4>
+      <div class="formula">Y = β₀ + β₁X + ε
+
+  Y   = Output (what we predict)
+  X   = Input feature
+  β₀  = Intercept (Y value when X = 0)
+  β₁  = Slope (how much Y changes per unit of X)
+  ε   = Error / noise term</div>
+      <h4>Multiple Linear Regression (many inputs)</h4>
+      <div class="formula">Y = β₀ + β₁X₁ + β₂X₂ + ... + βₙXₙ + ε</div>
+      <h3>How Coefficients Are Found</h3>
+      <p>Using <strong>Ordinary Least Squares (OLS)</strong> — minimize the total squared difference between actual and predicted values:</p>
+      <div class="formula">Minimize: SSR = Σ(Actual - Predicted)²</div>
+      <h3>5 Key Assumptions</h3>
+      <ul>
+        <li><strong>Linearity:</strong> X and Y have a straight-line relationship</li>
+        <li><strong>Independence:</strong> Observations don't influence each other</li>
+        <li><strong>Homoscedasticity:</strong> Error spread is constant (not fan-shaped)</li>
+        <li><strong>Normality:</strong> Residuals follow a bell curve</li>
+        <li><strong>No Multicollinearity:</strong> Input features are not highly correlated</li>
+      </ul>
+      <h3>Types of Regression</h3>
+      <table class="comp-table">
+        <tr><th>Type</th><th>When to Use</th><th>Key Feature</th></tr>
+        <tr><td>Simple Linear</td><td>1 input → 1 output</td><td>Basic, easy to understand</td></tr>
+        <tr><td>Multiple Linear</td><td>Many inputs → 1 output</td><td>Most common in practice</td></tr>
+        <tr><td>Polynomial</td><td>Curved relationship</td><td>Uses X, X², X³ terms</td></tr>
+        <tr><td>Ridge (L2)</td><td>Multicollinearity issue</td><td>Shrinks coefficients toward zero</td></tr>
+        <tr><td>Lasso (L1)</td><td>Too many features</td><td>Sets unimportant coefficients to exactly 0</td></tr>
+        <tr><td>Elastic Net</td><td>Both problems present</td><td>Combines Ridge + Lasso</td></tr>
+      </table>
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span>Lasso is unique because it performs automatic <strong>feature selection</strong> — it eliminates irrelevant features by making their coefficient = 0.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-card unit-3">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 3.2</span>
+        <span class="card-title">Performance Metrics — Accuracy, Precision, Recall, F1, ROC</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🎯</span>
+        <strong>Simple:</strong> After training a model, you need a report card. Each metric tells you something different about where the model is right and wrong. Picking the right metric depends on what kind of mistake costs more.
+      </div>
+      <h3>The Confusion Matrix (Foundation)</h3>
+      <div class="cm-grid">
+        <div class="cm-cell cm-header"></div>
+        <div class="cm-cell cm-header">Predicted YES</div>
+        <div class="cm-cell cm-header">Predicted NO</div>
+        <div class="cm-cell cm-label">Actual YES</div>
+        <div class="cm-cell cm-tp">TP ✅<br><small>True Positive</small></div>
+        <div class="cm-cell cm-fn">FN ❌<br><small>False Negative</small></div>
+        <div class="cm-cell cm-label">Actual NO</div>
+        <div class="cm-cell cm-fp">FP ❌<br><small>False Positive</small></div>
+        <div class="cm-cell cm-tn">TN ✅<br><small>True Negative</small></div>
+      </div>
+      <h4>Accuracy</h4>
+      <div class="formula">Accuracy = (TP + TN) / Total
+→ Overall % correct. NOT good for imbalanced data!</div>
+      <h4>Precision</h4>
+      <div class="formula">Precision = TP / (TP + FP)
+→ When model says "Yes", how often is it right?
+→ Use when FALSE POSITIVE is costly (spam filter)</div>
+      <h4>Recall (Sensitivity)</h4>
+      <div class="formula">Recall = TP / (TP + FN)
+→ Of all real Positives, how many did we catch?
+→ Use when FALSE NEGATIVE is costly (cancer test)</div>
+      <h4>F1-Score</h4>
+      <div class="formula">F1 = 2 × (Precision × Recall) / (Precision + Recall)
+→ Harmonic mean — best single balanced metric!</div>
+      <h3>ROC Curve and AUC</h3>
+      <ul>
+        <li>ROC Curve plots <strong>True Positive Rate vs False Positive Rate</strong> at all threshold values</li>
+        <li><strong>AUC = 1.0</strong> — Perfect model</li>
+        <li><strong>AUC = 0.5</strong> — Random guessing (useless)</li>
+        <li><strong>AUC &gt; 0.7</strong> — Acceptable</li>
+        <li><strong>AUC &gt; 0.9</strong> — Excellent</li>
+      </ul>
+      <table class="comp-table">
+        <tr><th>Scenario</th><th>Best Metric</th><th>Reason</th></tr>
+        <tr><td>Cancer detection</td><td>Recall</td><td>Missing a case is deadly (FN is bad)</td></tr>
+        <tr><td>Spam filter</td><td>Precision</td><td>Blocking real mail is annoying (FP is bad)</td></tr>
+        <tr><td>Imbalanced classes</td><td>F1-Score or AUC</td><td>Accuracy is misleading here</td></tr>
+        <tr><td>Balanced classes</td><td>Accuracy</td><td>Safe to use here</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="topic-card unit-3">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 3.3</span>
+        <span class="card-title">kNN Algorithm</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🏘️</span>
+        <strong>Simple:</strong> kNN says "You are like your neighbors." To classify a new data point, it finds the K most similar existing points and takes a majority vote. No training — it just remembers everything and compares at prediction time.
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-num" style="background:rgba(255,214,10,0.15);color:var(--unit3);">1</div><div class="step-content"><strong>Store all training data</strong><span>No actual model is built — this is "lazy learning"</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(255,214,10,0.15);color:var(--unit3);">2</div><div class="step-content"><strong>New data point arrives</strong><span>Calculate distance to every stored training point</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(255,214,10,0.15);color:var(--unit3);">3</div><div class="step-content"><strong>Find K nearest neighbors</strong><span>Sort all distances and pick the closest K points</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(255,214,10,0.15);color:var(--unit3);">4</div><div class="step-content"><strong>Predict</strong><span>Classification: majority vote | Regression: average value</span></div></div>
+      </div>
+      <h3>Distance Formulas</h3>
+      <div class="formula">Euclidean:  d = √(Σ(xᵢ - yᵢ)²)    ← Most common
+Manhattan:  d = Σ|xᵢ - yᵢ|        ← City block distance
+Minkowski:  d = (Σ|xᵢ - yᵢ|^p)^(1/p) ← Generalized form</div>
+      <h3>How to Choose K</h3>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">📉</span><div class="label">Small K (e.g. 1)</div><div class="value">Overfitting — too sensitive to noise</div></div>
+        <div class="info-box"><span class="icon">📈</span><div class="label">Large K (e.g. 100)</div><div class="value">Underfitting — too smooth, misses patterns</div></div>
+        <div class="info-box"><span class="icon">✅</span><div class="label">Optimal K</div><div class="value">Found using cross-validation — usually 5 to 15</div></div>
+      </div>
+      <table class="comp-table">
+        <tr><th>Property</th><th>Description</th></tr>
+        <tr><td>Algorithm Type</td><td>Supervised, Lazy Learning (no training phase)</td></tr>
+        <tr><td>Training Speed</td><td>Instant — just stores data</td></tr>
+        <tr><td>Prediction Speed</td><td>Slow — computes distance each time</td></tr>
+        <tr><td>Memory Usage</td><td>High — stores entire training dataset</td></tr>
+        <tr><td>Needs Normalization?</td><td>YES — scale-sensitive algorithm</td></tr>
+      </table>
+      <div class="callout callout-danger">
+        <span class="callout-icon">🚨</span>
+        <span>Always normalize features before using kNN! A feature like "salary (50,000)" will dominate "age (25)" just because of its bigger numbers.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ UNIT 4 ══════ -->
+<section id="unit4" class="unit-section unit-4">
+  <div class="unit-header">
+    <div class="unit-number">04</div>
+    <div class="unit-title-block">
+      <h2>Neural Networks &amp; Advanced Learning</h2>
+      <p>// 3 topics · ANN · Deep Learning · Ensemble Methods</p>
+    </div>
+  </div>
+
+  <div class="topic-card unit-4">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 4.1</span>
+        <span class="card-title">Concept of Neural Networks</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🧠</span>
+        <strong>Simple:</strong> A neural network is your brain, but made of math. Your brain has biological neurons connected by synapses. A neural network has artificial neurons connected by weights — and it learns by adjusting those weights.
+      </div>
+      <h3>Structure: 3 Layers</h3>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">📥</span><div class="label">Input Layer</div><div class="value">Receives raw features (X₁, X₂, ..., Xₙ)</div></div>
+        <div class="info-box"><span class="icon">⚙️</span><div class="label">Hidden Layer(s)</div><div class="value">Learn patterns using weights + activation functions</div></div>
+        <div class="info-box"><span class="icon">📤</span><div class="label">Output Layer</div><div class="value">Produces final prediction (class or number)</div></div>
+      </div>
+      <h3>How One Neuron Works</h3>
+      <div class="formula">z      = w₁x₁ + w₂x₂ + ... + wₙxₙ + b    (weighted sum + bias)
+output = activation_function(z)              (non-linear transform)
+
+  w = weights (what the network learns)
+  b = bias (shifts the activation)
+  activation = adds non-linearity to learn complex patterns</div>
+      <h3>Activation Functions</h3>
+      <table class="comp-table">
+        <tr><th>Function</th><th>Formula</th><th>Best For</th></tr>
+        <tr><td>ReLU</td><td>max(0, x)</td><td>Hidden layers — most popular today</td></tr>
+        <tr><td>Sigmoid</td><td>1/(1+e⁻ˣ)</td><td>Output layer (binary classification)</td></tr>
+        <tr><td>Tanh</td><td>(eˣ-e⁻ˣ)/(eˣ+e⁻ˣ)</td><td>Hidden layers (symmetric, -1 to 1)</td></tr>
+        <tr><td>Softmax</td><td>eˣⁱ / Σeˣʲ</td><td>Output layer (multi-class)</td></tr>
+      </table>
+      <h3>Training: 4 Steps Repeated</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num" style="background:rgba(76,201,240,0.15);color:var(--unit4);">→</div><div class="step-content"><strong>Forward Pass</strong><span>Data flows layer by layer: input → hidden → output</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(76,201,240,0.15);color:var(--unit4);">📉</div><div class="step-content"><strong>Calculate Loss</strong><span>Measure how wrong prediction is using loss function (MSE or Cross-Entropy)</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(76,201,240,0.15);color:var(--unit4);">←</div><div class="step-content"><strong>Backpropagation</strong><span>Error travels backwards; chain rule computes gradient for each weight</span></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(76,201,240,0.15);color:var(--unit4);">↻</div><div class="step-content"><strong>Update Weights</strong><span>w = w − α × gradient (α = learning rate). Repeat for all epochs.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-card unit-4">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 4.2</span>
+        <span class="card-title">Deep Learning and Its Applications</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🏗️</span>
+        <strong>Simple:</strong> Deep Learning = Neural Networks with MANY layers. Each layer learns something more complex than the previous one. It's the technology powering ChatGPT, Google Photos, Siri, Tesla's autopilot, and medical AI.
+      </div>
+      <h3>Why "Deep"?</h3>
+      <div class="formula">Layer 1 → Learns pixels and edges
+Layer 2 → Learns shapes and textures
+Layer 3 → Learns object parts (eyes, ears, wheels)
+Layer 4 → Learns complete objects (cat, dog, car)</div>
+      <h3>Major Deep Learning Architectures</h3>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">🖼️</span><div class="label">CNN</div><div class="value">Convolutional Neural Network — for images &amp; video</div></div>
+        <div class="info-box"><span class="icon">📝</span><div class="label">RNN / LSTM</div><div class="value">Recurrent Networks — for sequences, text, speech</div></div>
+        <div class="info-box"><span class="icon">🤖</span><div class="label">Transformer</div><div class="value">Attention-based — ChatGPT, BERT, translation</div></div>
+        <div class="info-box"><span class="icon">🎨</span><div class="label">GAN</div><div class="value">Generative — deepfakes, art, data augmentation</div></div>
+        <div class="info-box"><span class="icon">🗜️</span><div class="label">Autoencoder</div><div class="value">Compression — anomaly detection, denoising</div></div>
+      </div>
+      <h3>Real-World Applications</h3>
+      <ul>
+        <li><strong>Healthcare:</strong> Cancer detection in X-rays, drug discovery, genomics</li>
+        <li><strong>Self-Driving Cars:</strong> Tesla, Waymo — object detection, lane tracking</li>
+        <li><strong>Voice Assistants:</strong> Siri, Alexa, Google Assistant</li>
+        <li><strong>Translation:</strong> Google Translate, DeepL</li>
+        <li><strong>Finance:</strong> Fraud detection, credit risk, trading bots</li>
+        <li><strong>Gaming:</strong> AlphaGo, game-playing AI agents</li>
+      </ul>
+      <table class="comp-table">
+        <tr><th>Feature</th><th>Traditional ML</th><th>Deep Learning</th></tr>
+        <tr><td>Feature Engineering</td><td>Manual (you do it)</td><td>Automatic (model learns)</td></tr>
+        <tr><td>Data Required</td><td>Small to medium</td><td>Very large amounts</td></tr>
+        <tr><td>Interpretability</td><td>High (explainable)</td><td>Low (black box)</td></tr>
+        <tr><td>Best For</td><td>Structured/tabular data</td><td>Images, audio, text, video</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="topic-card unit-4">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 4.3</span>
+        <span class="card-title">Ensemble Learning</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">👥</span>
+        <strong>Simple:</strong> Would you trust one doctor's opinion, or get a second and third opinion too? Ensemble learning is the "get multiple opinions" strategy for ML — many models vote together, and the combined answer is more accurate than any single model alone.
+      </div>
+      <h3>Type 1: Bagging (Parallel)</h3>
+      <p>Train many models <strong>simultaneously</strong> on different random samples of data. Combine by voting or averaging.</p>
+      <div class="callout callout-tip" style="margin:0.5rem 0 1rem;">
+        <span class="callout-icon">🌲</span>
+        <span><strong>Random Forest = Bagging + Decision Trees.</strong> Each tree also uses a random subset of features. Reduces variance greatly!</span>
+      </div>
+      <h3>Type 2: Boosting (Sequential)</h3>
+      <p>Train models <strong>one after another</strong>. Each model focuses on the mistakes made by the previous one.</p>
+      <ul>
+        <li><strong>AdaBoost:</strong> Increases weight of misclassified samples each round</li>
+        <li><strong>Gradient Boosting:</strong> Each tree fits the residual errors of the previous ensemble</li>
+        <li><strong>XGBoost / LightGBM:</strong> Optimized boosting — win most Kaggle competitions!</li>
+      </ul>
+      <h3>Type 3: Stacking</h3>
+      <p>Train multiple different base models. Then train a <strong>meta-learner</strong> on top of their outputs to combine them optimally.</p>
+      <table class="comp-table">
+        <tr><th>Method</th><th>Order</th><th>Goal</th><th>Example</th></tr>
+        <tr><td>Bagging</td><td>Parallel</td><td>Reduce variance</td><td>Random Forest</td></tr>
+        <tr><td>Boosting</td><td>Sequential</td><td>Reduce bias</td><td>XGBoost, LightGBM</td></tr>
+        <tr><td>Stacking</td><td>Mixed</td><td>Combine strengths</td><td>Custom ensembles</td></tr>
+      </table>
+      <div class="callout callout-tip">
+        <span class="callout-icon">🏆</span>
+        <span>XGBoost and LightGBM win the majority of machine learning competitions on structured tabular data. Learn them well!</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ UNIT 5 ══════ -->
+<section id="unit5" class="unit-section unit-5">
+  <div class="unit-header">
+    <div class="unit-number">05</div>
+    <div class="unit-title-block">
+      <h2>Model Evaluation &amp; Validation</h2>
+      <p>// 3 topics · Bias-Variance · Cross-Validation · Confusion Matrix</p>
+    </div>
+  </div>
+
+  <div class="topic-card unit-5">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 5.1</span>
+        <span class="card-title">Concept of Bias and Variance</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🎯</span>
+        <strong>Simple:</strong> Imagine an archer shooting at a target. Bias = arrows always land in the same wrong spot (consistent but wrong). Variance = arrows scatter all over randomly (inconsistent). The ideal model hits the bullseye every time.
+      </div>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">📏</span><div class="label">Bias</div><div class="value">Error from oversimplification. Model is too simple → Underfitting</div></div>
+        <div class="info-box"><span class="icon">🎲</span><div class="label">Variance</div><div class="value">Error from over-sensitivity to training data → Overfitting</div></div>
+        <div class="info-box"><span class="icon">🔇</span><div class="label">Irreducible Noise</div><div class="value">Random noise in data. Cannot be removed ever.</div></div>
+      </div>
+      <div class="formula">Total Error = Bias² + Variance + Irreducible Noise</div>
+      <h3>The Tradeoff</h3>
+      <table class="comp-table">
+        <tr><th></th><th>High Bias</th><th>Low Bias</th></tr>
+        <tr><td><strong>High Variance</strong></td><td>Worst case — both problems</td><td>Overfitting 🔴</td></tr>
+        <tr><td><strong>Low Variance</strong></td><td>Underfitting 🟡</td><td>Ideal Model ✅</td></tr>
+      </table>
+      <h3>Archer Analogy</h3>
+      <ul>
+        <li>🎯 <strong>High Bias, Low Variance:</strong> Arrows hit same wrong spot — consistent but off-center</li>
+        <li>🌪️ <strong>Low Bias, High Variance:</strong> Arrows scattered randomly — no consistency</li>
+        <li>✅ <strong>Low Bias, Low Variance:</strong> Arrows cluster at bullseye — this is what we aim for!</li>
+      </ul>
+      <h3>How to Fix Each Problem</h3>
+      <table class="comp-table">
+        <tr><th>Problem</th><th>Solution</th></tr>
+        <tr><td>High Bias (Underfitting)</td><td>Use more complex model, add features, reduce regularization</td></tr>
+        <tr><td>High Variance (Overfitting)</td><td>Regularization, more training data, simpler model, dropout, ensemble methods</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="topic-card unit-5">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 5.2</span>
+        <span class="card-title">K-Fold and LOOCV Cross-Validation</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">🔄</span>
+        <strong>Simple:</strong> A single train-test split is like having one exam to judge your intelligence. What if you were lucky or unlucky that day? Cross-validation gives you many exams and averages the score — much fairer and more reliable!
+      </div>
+      <h3>K-Fold Cross-Validation</h3>
+      <p>Split data into K equal chunks (folds). Each fold takes a turn as the test set while the rest train the model.</p>
+      <div class="formula">Example with K = 5:
+
+Fold 1: [ TEST  | Train | Train | Train | Train ]
+Fold 2: [ Train | TEST  | Train | Train | Train ]
+Fold 3: [ Train | Train | TEST  | Train | Train ]
+Fold 4: [ Train | Train | Train | TEST  | Train ]
+Fold 5: [ Train | Train | Train | Train | TEST  ]
+
+Final Score = Average of 5 individual test scores</div>
+      <ul>
+        <li>Most common values: <strong>K = 5 or K = 10</strong></li>
+        <li>Higher K = less bias, more computation</li>
+        <li>All data is used for both training and testing</li>
+      </ul>
+      <h3>LOOCV — Leave-One-Out Cross-Validation</h3>
+      <p>Special case where <strong>K = N</strong> (total number of data points). Each time, just 1 sample is the test set.</p>
+      <div class="formula">If N = 100 samples:
+→ Train 100 separate models
+→ Each time: 1 sample is tested, 99 are used for training
+→ Average all 100 scores</div>
+      <table class="comp-table">
+        <tr><th>Feature</th><th>K-Fold</th><th>LOOCV</th></tr>
+        <tr><td>Number of splits</td><td>K (e.g. 5 or 10)</td><td>N (all samples)</td></tr>
+        <tr><td>Computation cost</td><td>Moderate</td><td>Very high</td></tr>
+        <tr><td>Bias</td><td>Low</td><td>Lowest</td></tr>
+        <tr><td>Variance in estimate</td><td>Low to moderate</td><td>High</td></tr>
+        <tr><td>Best for</td><td>Most situations</td><td>Very small datasets</td></tr>
+      </table>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <span>LOOCV is theoretically the least biased but practically too slow for large datasets. Use K-Fold (K=5 or 10) in most cases.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-card unit-5">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="q-number">Q 5.3</span>
+        <span class="card-title">Confusion Matrix with Example</span>
+      </div>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="card-body">
+      <div class="simple-explain">
+        <span class="emoji">📋</span>
+        <strong>Simple:</strong> A confusion matrix shows not just how many predictions were right, but exactly WHERE and HOW the model made mistakes. It's the single most informative summary of a classifier's performance.
+      </div>
+      <h3>The 4 Cells</h3>
+      <div class="cm-grid">
+        <div class="cm-cell cm-header"></div>
+        <div class="cm-cell cm-header">Predicted YES</div>
+        <div class="cm-cell cm-header">Predicted NO</div>
+        <div class="cm-cell cm-label">Actual YES</div>
+        <div class="cm-cell cm-tp">TP = 3<br><small>Correctly found disease ✅</small></div>
+        <div class="cm-cell cm-fn">FN = 2<br><small>Missed disease ⚠️</small></div>
+        <div class="cm-cell cm-label">Actual NO</div>
+        <div class="cm-cell cm-fp">FP = 1<br><small>False alarm ❌</small></div>
+        <div class="cm-cell cm-tn">TN = 4<br><small>Correctly healthy ✅</small></div>
+      </div>
+      <h3>Worked Example (Medical Test, 10 Patients)</h3>
+      <table class="comp-table">
+        <tr><th>Patients</th><th>Actual</th><th>Predicted</th><th>Outcome</th></tr>
+        <tr><td>1, 2, 7</td><td>Disease</td><td>Disease</td><td>✅ True Positive (TP = 3)</td></tr>
+        <tr><td>3, 9</td><td>Disease</td><td>No Disease</td><td>❌ False Negative (FN = 2) — missed!</td></tr>
+        <tr><td>4</td><td>No Disease</td><td>Disease</td><td>❌ False Positive (FP = 1) — false alarm</td></tr>
+        <tr><td>5, 6, 8, 10</td><td>No Disease</td><td>No Disease</td><td>✅ True Negative (TN = 4)</td></tr>
+      </table>
+      <h3>Calculated Metrics</h3>
+      <div class="formula">Accuracy  = (3 + 4) / 10              = 70%
+Precision = 3 / (3 + 1)              = 75%
+Recall    = 3 / (3 + 2)              = 60%
+F1-Score  = 2×(0.75×0.60)/(0.75+0.60) = 66.7%</div>
+      <h3>What Each Error Means in Practice</h3>
+      <div class="info-grid">
+        <div class="info-box"><span class="icon">🚨</span><div class="label">False Negative (FN) = Type II</div><div class="value">Missed a real case. Most dangerous in medical diagnosis — patient goes untreated!</div></div>
+        <div class="info-box"><span class="icon">📢</span><div class="label">False Positive (FP) = Type I</div><div class="value">False alarm. Causes unnecessary treatment or anxiety.</div></div>
+      </div>
+      <div class="callout callout-danger">
+        <span class="callout-icon">🔴</span>
+        <span><strong>Type I Error = FP</strong> | <strong>Type II Error = FN</strong>. In medicine, Type II (missed disease) is far more dangerous than Type I (false alarm). Always consider which error is more costly!</span>
+      </div>
+      <h3>Multi-Class Confusion Matrix</h3>
+      <p>For 3+ classes (Cat, Dog, Bird), the matrix becomes N×N. Diagonal cells = correct predictions. Off-diagonal = which classes get confused with each other.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>PMA Study Guide &nbsp;·&nbsp; 5 Units &nbsp;·&nbsp; 13 Topics &nbsp;·&nbsp; Designed for <span>exam success</span></p>
+</footer>
+
+<div id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+// Animated canvas background
+const canvas = document.getElementById('canvas-bg');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+const COLORS = ['#00f5d4','#4cc9f0','#7209b7','#f72585'];
+
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W; this.y = Math.random() * H;
+    this.vx = (Math.random()-0.5)*0.4; this.vy = (Math.random()-0.5)*0.4;
+    this.r = Math.random()*1.5+0.5;
+    this.color = COLORS[Math.floor(Math.random()*COLORS.length)];
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x<0||this.x>W||this.y<0||this.y>H) this.reset();
+  }
+  draw() {
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle = this.color; ctx.fill();
+  }
+}
+
+for (let i=0;i<80;i++) particles.push(new Particle());
+
+function drawConnections() {
+  for (let i=0;i<particles.length;i++) {
+    for (let j=i+1;j<particles.length;j++) {
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if (dist<120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(0,245,212,${(1-dist/120)*0.15})`;
+        ctx.lineWidth=0.5; ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw();});
+  drawConnections();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Accordion toggle
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.card-body.open').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.card-header.open').forEach(h=>h.classList.remove('open'));
+  if (!isOpen) {
+    body.classList.add('open');
+    header.classList.add('open');
+    setTimeout(()=>{
+      body.querySelectorAll('.step').forEach((s,i)=>{
+        setTimeout(()=>s.classList.add('visible'), i*80);
+      });
+    }, 100);
+  }
+}
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, {threshold:0.1, rootMargin:'0px 0px -50px 0px'});
+
+document.querySelectorAll('.topic-card, .unit-header').forEach((el,i)=>{
+  el.style.transitionDelay = `${(i%3)*0.08}s`;
+  observer.observe(el);
+});
+
+// Back to top
+const btt = document.getElementById('btt');
+window.addEventListener('scroll', ()=>{
+  btt.classList.toggle('show', window.scrollY>400);
+});
+</script>
+</body>
+</html>
